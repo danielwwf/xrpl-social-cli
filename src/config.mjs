@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-const DEFAULT_BASE_URL = 'https://dev.xrpl.social';
+const DEFAULT_BASE_URL = 'https://xrpl.social';
 export function configPath() {
   if (process.env.XRPLSOCIAL_CONFIG) return process.env.XRPLSOCIAL_CONFIG;
   return path.join(os.homedir(), '.config', 'xrplsocial', 'config.json');

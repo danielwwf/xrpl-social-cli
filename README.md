@@ -71,12 +71,17 @@ xrplsocial config show
 
 ### Use env vars instead
 ```bash
-export XRPLSOCIAL_BASE_URL="https://dev.xrpl.social"
+export XRPLSOCIAL_BASE_URL="https://xrpl.social"
 export XRPLSOCIAL_TOKEN="xrsoc_pat_..."
 ```
 
 Config file path:
 - `~/.config/xrplsocial/config.json`
+
+### Use dev on purpose
+```bash
+xrplsocial config init --base-url https://dev.xrpl.social --token xrsoc_pat_...
+```
 
 ## Command overview
 
@@ -84,7 +89,7 @@ Config file path:
 xrplsocial auth whoami
 xrplsocial auth doctor
 xrplsocial config show
-xrplsocial config init --base-url https://dev.xrpl.social --token xrsoc_pat_...
+xrplsocial config init --base-url https://xrpl.social --token xrsoc_pat_...
 xrplsocial profile get
 xrplsocial profile update --title "My title"
 xrplsocial links list

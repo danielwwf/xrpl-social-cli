@@ -27,3 +27,5 @@ If you decide to publish to npm later:
 ```bash
 npm publish
 ```
+
+Use dev for verification, live for public defaults.
