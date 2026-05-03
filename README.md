@@ -1,12 +1,44 @@
-# xrpl-social-cli
+<p align="center">
+  <img src="assets/brand/xrpl-social-icon-dark.svg" alt="XRPL Social icon" width="96" />
+</p>
 
-Minimal JSON-first CLI for the XRPL Social agent API.
+<p align="center">
+  <img src="assets/brand/xrpl-logo-with-icon-2-white.svg" alt="XRPL Social wordmark" width="420" />
+</p>
+
+<p align="center">
+  <strong>JSON-first CLI for XRPL Social agent APIs.</strong><br/>
+  Clean commands, boring config, strong defaults, no nonsense.
+</p>
+
+<p align="center">
+  <a href="https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Node >=20" src="https://img.shields.io/badge/node-%3E%3D20-111827?logo=node.js&logoColor=7ee787">
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-111827">
+</p>
+
+## Why this exists
+
+`xrpl-social-cli` is the practical shell for XRPL Social's agent-safe API surface.
+It is built for automation, operator workflows, scripting, and AI agents that need a deterministic interface instead of scraping HTML or pretending to be a browser.
+
+## Features
+
+- JSON-first output everywhere
+- token + base-url config via env or config file
+- profile read/update
+- links list/create/update/delete/reorder/sync
+- shorts list/create/update/toggle/delete/QR download
+- analytics summary + links + shorts
+- `auth doctor` for config/auth sanity checks
+- GitHub Actions CI smoke coverage
 
 ## Requirements
+
 - Node.js 20+
 - XRPL Social agent token with the scopes you need
 
-## Install / run
+## Install
 
 ### Run from source
 ```bash
@@ -21,22 +53,25 @@ npm install -g .
 xrplsocial --help
 ```
 
-## Config
-
-Quick setup:
+## Quick start
 
 ```bash
 xrplsocial config init   --base-url https://dev.xrpl.social   --token xrsoc_pat_...
+
+xrplsocial auth doctor
+xrplsocial profile get
+xrplsocial links list
+xrplsocial analytics summary --window 7d
 ```
 
-Show effective config:
+## Config
 
+### Show effective config
 ```bash
 xrplsocial config show
 ```
 
-Or use env vars:
-
+### Use env vars instead
 ```bash
 export XRPLSOCIAL_BASE_URL="https://dev.xrpl.social"
 export XRPLSOCIAL_TOKEN="xrsoc_pat_..."
@@ -45,10 +80,11 @@ export XRPLSOCIAL_TOKEN="xrsoc_pat_..."
 Config file path:
 - `~/.config/xrplsocial/config.json`
 
-## Commands
+## Command overview
 
 ```bash
 xrplsocial auth whoami
+xrplsocial auth doctor
 xrplsocial config show
 xrplsocial config init --base-url https://dev.xrpl.social --token xrsoc_pat_...
 xrplsocial profile get
@@ -92,6 +128,17 @@ xrplsocial analytics shorts --window 7d
 ```
 
 ## Notes
+
 - Delete is defensive by default. Missing links are only removed when `--delete-missing` is passed.
 - Reorder expects the full owned link id set, not only a partial subset.
 - Do not put real tokens into shell history on shared machines. Prefer config file or env management.
+
+## Development
+
+```bash
+npm run ci
+```
+
+## License
+
+MIT
