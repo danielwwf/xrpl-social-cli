@@ -9,11 +9,13 @@
   "files": [
     "bin",
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "smoke": "node scripts/smoke.mjs",
-    "lint:check": "node bin/xrplsocial.js --help > /dev/null"
+    "lint:check": "node bin/xrplsocial.js --help > /dev/null",
+    "ci": "npm run lint:check && npm run smoke"
   },
   "keywords": [
     "xrpl",

@@ -11,4 +11,5 @@ const tempConfigDir = fs.mkdtempSync(path.join(os.tmpdir(), 'xrplsocial-cli-'));
 const env = { ...process.env, XRPLSOCIAL_CONFIG: path.join(tempConfigDir, 'config.json') };
 run(['config','init','--base-url','https://dev.xrpl.social','--token','xrsoc_pat_example'], env);
 run(['config','show'], env);
+run(['auth','doctor'], env);
 console.log(JSON.stringify({ ok: true }, null, 2));

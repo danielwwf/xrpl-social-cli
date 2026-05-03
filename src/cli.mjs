@@ -16,11 +16,16 @@ function parseArgs(argv) {
   return { positional, flags };
 }
 function print(obj) { console.log(JSON.stringify(obj, null, 2)); }
+function boolFlag(value, fallback = undefined) {
+  if (value === undefined) return fallback;
+  return value === true || value === 'true' || value === '1';
+}
 function usage() {
   return {
     ok: true,
     usage: [
       'xrplsocial auth whoami',
+      'xrplsocial auth doctor',
       'xrplsocial config show',
       'xrplsocial config init --base-url https://dev.xrpl.social --token xrsoc_pat_...',
       'xrplsocial profile get',
@@ -33,7 +38,7 @@ function usage() {
       'xrplsocial links sync --file links.json [--delete-missing]',
       'xrplsocial shorts list',
       'xrplsocial shorts create --title "..." --destination-url https://...',
-      'xrplsocial shorts update --id 123 --title "..." --destination-url https://...',
+      'xrplsocial shorts update --id 123 --destination-url https://... [--title "..."]',
       'xrplsocial shorts toggle --id 123',
       'xrplsocial shorts delete --id 123',
       'xrplsocial shorts qr --id 123 --out short-123.png',
@@ -44,14 +49,34 @@ function usage() {
   };
 }
 function requireId(flags) {
-  if (!flags.id) throw new Error('Missing --id <short_id>');
+  if (!flags.id) throw new Error('Missing --id <id>');
   return String(flags.id);
+}
+function requireFields(flags, names) {
+  for (const name of names) if (flags[name] === undefined) throw new Error(`Missing --${name}`);
+}
+function queryWindow(flags) {
+  return flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
 }
 export async function run(argv) {
   const { positional, flags } = parseArgs(argv);
   const [group, command] = positional;
   if (!group || flags.help) return print(usage());
   if (group === 'auth' && command === 'whoami') return print(await api('/me'));
+  if (group === 'auth' && command === 'doctor') {
+    const cfg = readConfig();
+    const result = { config_path: configPath(), baseUrl: cfg.baseUrl, token_present: Boolean(cfg.token), api_ok: false };
+    if (cfg.token) {
+      try {
+        const me = await api('/me');
+        result.api_ok = true;
+        result.user = me.result?.user || null;
+      } catch (error) {
+        result.api_error = error.message;
+      }
+    }
+    return print({ ok: true, result });
+  }
   if (group === 'config' && command === 'show') {
     const cfg = readConfig();
     return print({ ok: true, result: { config_path: configPath(), baseUrl: cfg.baseUrl, token_present: Boolean(cfg.token) } });
@@ -69,13 +94,14 @@ export async function run(argv) {
   }
   if (group === 'links' && command === 'list') return print(await api('/links'));
   if (group === 'links' && command === 'create') {
-    return print(await api('/links', { method: 'POST', body: { label: flags.label, url: flags.url, subtitle: flags.subtitle, type: flags.type, is_active: flags['is-active'] === undefined ? true : flags['is-active'] === 'true' || flags['is-active'] === true } }));
+    requireFields(flags, ['label', 'url']);
+    return print(await api('/links', { method: 'POST', body: { label: flags.label, url: flags.url, subtitle: flags.subtitle, type: flags.type, is_active: boolFlag(flags['is-active'], true) } }));
   }
   if (group === 'links' && command === 'update') {
     const id = requireId(flags);
     const body = {};
     for (const [flag, key] of [['label','label'],['url','url'],['subtitle','subtitle'],['type','type']]) if (flags[flag] !== undefined) body[key] = flags[flag];
-    if (flags['is-active'] !== undefined) body.is_active = flags['is-active'] === 'true' || flags['is-active'] === true;
+    if (flags['is-active'] !== undefined) body.is_active = boolFlag(flags['is-active']);
     return print(await api(`/links/${id}`, { method: 'PATCH', body }));
   }
   if (group === 'links' && command === 'delete') return print(await api(`/links/${requireId(flags)}`, { method: 'DELETE' }));
@@ -92,14 +118,15 @@ export async function run(argv) {
   }
   if (group === 'shorts' && command === 'list') return print(await api('/shorts'));
   if (group === 'shorts' && command === 'create') {
-    return print(await api('/shorts', { method: 'POST', body: { title: flags.title, destination_url: flags['destination-url'], is_active: flags['is-active'] === undefined ? true : flags['is-active'] === 'true' || flags['is-active'] === true } }));
+    requireFields(flags, ['destination-url']);
+    return print(await api('/shorts', { method: 'POST', body: { title: flags.title, destination_url: flags['destination-url'], is_active: boolFlag(flags['is-active'], true) } }));
   }
   if (group === 'shorts' && command === 'update') {
     const id = requireId(flags);
     if (flags['destination-url'] === undefined) throw new Error('Missing --destination-url for shorts update');
     const body = { destination_url: flags['destination-url'] };
     if (flags.title !== undefined) body.title = flags.title;
-    if (flags['is-active'] !== undefined) body.is_active = flags['is-active'] === 'true' || flags['is-active'] === true;
+    if (flags['is-active'] !== undefined) body.is_active = boolFlag(flags['is-active']);
     return print(await api(`/shorts/${id}`, { method: 'PATCH', body }));
   }
   if (group === 'shorts' && command === 'toggle') return print(await api(`/shorts/${requireId(flags)}/toggle`, { method: 'POST' }));
@@ -115,17 +142,8 @@ export async function run(argv) {
     fs.writeFileSync(out, buf);
     return print({ ok: true, result: { path: out, bytes: buf.length } });
   }
-  if (group === 'analytics' && command === 'summary') {
-    const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
-    return print(await api(`/analytics/summary${query}`));
-  }
-  if (group === 'analytics' && command === 'links') {
-    const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
-    return print(await api(`/analytics/links${query}`));
-  }
-  if (group === 'analytics' && command === 'shorts') {
-    const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
-    return print(await api(`/analytics/shorts${query}`));
-  }
+  if (group === 'analytics' && command === 'summary') return print(await api(`/analytics/summary${queryWindow(flags)}`));
+  if (group === 'analytics' && command === 'links') return print(await api(`/analytics/links${queryWindow(flags)}`));
+  if (group === 'analytics' && command === 'shorts') return print(await api(`/analytics/shorts${queryWindow(flags)}`));
   throw new Error(`Unknown command: ${positional.join(' ')}`);
 }
