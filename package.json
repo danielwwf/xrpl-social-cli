@@ -1,0 +1,15 @@
+{
+  "name": "xrpl-social-cli",
+  "version": "0.1.0",
+  "description": "CLI for XRPL Social agent API",
+  "type": "module",
+  "bin": {
+    "xrplsocial": "bin/xrplsocial.js"
+  },
+  "scripts": {
+    "test:smoke": "node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
