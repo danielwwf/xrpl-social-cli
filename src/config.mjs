@@ -9,11 +9,15 @@ export function configPath() {
 export function readConfig() {
   const file = configPath();
   let fileConfig = {};
-  if (fs.existsSync(file)) {
-    fileConfig = JSON.parse(fs.readFileSync(file, 'utf8'));
-  }
+  if (fs.existsSync(file)) fileConfig = JSON.parse(fs.readFileSync(file, 'utf8'));
   return {
     baseUrl: process.env.XRPLSOCIAL_BASE_URL || fileConfig.baseUrl || DEFAULT_BASE_URL,
     token: process.env.XRPLSOCIAL_TOKEN || fileConfig.token || null,
   };
+}
+export function writeConfig(nextConfig) {
+  const file = configPath();
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(nextConfig, null, 2) + '\n');
+  return file;
 }
