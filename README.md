@@ -2,12 +2,23 @@
 
 Minimal JSON-first CLI for the XRPL Social agent API.
 
+## Requirements
+- Node.js 20+
+- XRPL Social agent token with the scopes you need
+
 ## Install / run
 
+### Run from source
 ```bash
 git clone https://github.com/danielwwf/xrpl-social-cli.git
 cd xrpl-social-cli
 node bin/xrplsocial.js --help
+```
+
+### Global install from local checkout
+```bash
+npm install -g .
+xrplsocial --help
 ```
 
 ## Config
@@ -15,13 +26,13 @@ node bin/xrplsocial.js --help
 Quick setup:
 
 ```bash
-node bin/xrplsocial.js config init   --base-url https://dev.xrpl.social   --token xrsoc_pat_...
+xrplsocial config init   --base-url https://dev.xrpl.social   --token xrsoc_pat_...
 ```
 
 Show effective config:
 
 ```bash
-node bin/xrplsocial.js config show
+xrplsocial config show
 ```
 
 Or use env vars:
@@ -61,8 +72,9 @@ xrplsocial analytics links --window 7d
 xrplsocial analytics shorts --window 7d
 ```
 
-## links sync file shape
+## File shapes
 
+### links sync
 ```json
 {
   "links": [
@@ -72,15 +84,14 @@ xrplsocial analytics shorts --window 7d
 }
 ```
 
-Delete is defensive by default. Missing links are only removed when `--delete-missing` is passed.
-
-
-## links reorder file shape
-
+### links reorder
 ```json
 {
   "order": [123, 456, 789]
 }
 ```
 
-Reorder expects the full owned link id set, not only a partial subset.
+## Notes
+- Delete is defensive by default. Missing links are only removed when `--delete-missing` is passed.
+- Reorder expects the full owned link id set, not only a partial subset.
+- Do not put real tokens into shell history on shared machines. Prefer config file or env management.

@@ -6,9 +6,22 @@
   "bin": {
     "xrplsocial": "bin/xrplsocial.js"
   },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
   "scripts": {
-    "test:smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "lint:check": "node bin/xrplsocial.js --help > /dev/null"
   },
+  "keywords": [
+    "xrpl",
+    "cli",
+    "social",
+    "agent"
+  ],
+  "license": "MIT",
   "engines": {
     "node": ">=20"
   }
