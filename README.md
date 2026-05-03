@@ -43,6 +43,10 @@ xrplsocial config init --base-url https://dev.xrpl.social --token xrsoc_pat_...
 xrplsocial profile get
 xrplsocial profile update --title "My title"
 xrplsocial links list
+xrplsocial links create --label "Homepage" --url https://example.com
+xrplsocial links update --id 123 --label "Homepage" --url https://example.com/new
+xrplsocial links delete --id 123
+xrplsocial links reorder --file order.json
 xrplsocial links sync --file links.json
 xrplsocial links sync --file links.json --delete-missing
 xrplsocial shorts list
@@ -66,3 +70,14 @@ xrplsocial analytics summary --window 7d
 ```
 
 Delete is defensive by default. Missing links are only removed when `--delete-missing` is passed.
+
+
+## links reorder file shape
+
+```json
+{
+  "order": [123, 456, 789]
+}
+```
+
+Reorder expects the full owned link id set, not only a partial subset.

@@ -26,6 +26,10 @@ function usage() {
       'xrplsocial profile get',
       'xrplsocial profile update --title "..." --bio "..."',
       'xrplsocial links list',
+      'xrplsocial links create --label "..." --url https://...',
+      'xrplsocial links update --id 123 --label "..." --url https://...',
+      'xrplsocial links delete --id 123',
+      'xrplsocial links reorder --file order.json',
       'xrplsocial links sync --file links.json [--delete-missing]',
       'xrplsocial shorts list',
       'xrplsocial shorts create --title "..." --destination-url https://...',
@@ -61,6 +65,22 @@ export async function run(argv) {
     return print(await api('/profile', { method: 'PATCH', body }));
   }
   if (group === 'links' && command === 'list') return print(await api('/links'));
+  if (group === 'links' && command === 'create') {
+    return print(await api('/links', { method: 'POST', body: { label: flags.label, url: flags.url, subtitle: flags.subtitle, type: flags.type, is_active: flags['is-active'] === undefined ? true : flags['is-active'] === 'true' || flags['is-active'] === true } }));
+  }
+  if (group === 'links' && command === 'update') {
+    const id = requireId(flags);
+    const body = {};
+    for (const [flag, key] of [['label','label'],['url','url'],['subtitle','subtitle'],['type','type']]) if (flags[flag] !== undefined) body[key] = flags[flag];
+    if (flags['is-active'] !== undefined) body.is_active = flags['is-active'] === 'true' || flags['is-active'] === true;
+    return print(await api(`/links/${id}`, { method: 'PATCH', body }));
+  }
+  if (group === 'links' && command === 'delete') return print(await api(`/links/${requireId(flags)}`, { method: 'DELETE' }));
+  if (group === 'links' && command === 'reorder') {
+    if (!flags.file) throw new Error('Missing --file <order.json>');
+    const body = JSON.parse(fs.readFileSync(flags.file, 'utf8'));
+    return print(await api('/links/reorder', { method: 'POST', body }));
+  }
   if (group === 'links' && command === 'sync') {
     if (!flags.file) throw new Error('Missing --file <links.json>');
     const body = JSON.parse(fs.readFileSync(flags.file, 'utf8'));
