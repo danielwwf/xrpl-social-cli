@@ -54,8 +54,11 @@ xrplsocial shorts create --title "Launch" --destination-url https://example.com
 xrplsocial shorts update --id 123 --destination-url https://example.com/updated --title "Updated"
 xrplsocial shorts toggle --id 123
 xrplsocial shorts delete --id 123
+xrplsocial shorts qr --id 123 --out short-123.png
 xrplsocial analytics summary
 xrplsocial analytics summary --window 7d
+xrplsocial analytics links --window 7d
+xrplsocial analytics shorts --window 7d
 ```
 
 ## links sync file shape

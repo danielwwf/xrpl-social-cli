@@ -36,7 +36,10 @@ function usage() {
       'xrplsocial shorts update --id 123 --title "..." --destination-url https://...',
       'xrplsocial shorts toggle --id 123',
       'xrplsocial shorts delete --id 123',
-      'xrplsocial analytics summary [--window all|today|7d|30d]'
+      'xrplsocial shorts qr --id 123 --out short-123.png',
+      'xrplsocial analytics summary [--window all|today|7d|30d]',
+      'xrplsocial analytics links [--window all|today|7d|30d]',
+      'xrplsocial analytics shorts [--window all|today|7d|30d]'
     ]
   };
 }
@@ -101,9 +104,28 @@ export async function run(argv) {
   }
   if (group === 'shorts' && command === 'toggle') return print(await api(`/shorts/${requireId(flags)}/toggle`, { method: 'POST' }));
   if (group === 'shorts' && command === 'delete') return print(await api(`/shorts/${requireId(flags)}`, { method: 'DELETE' }));
+  if (group === 'shorts' && command === 'qr') {
+    const id = requireId(flags);
+    const out = flags.out || `short-${id}-qr.png`;
+    const { baseUrl, token } = readConfig();
+    if (!token) throw new Error('Missing XRPLSOCIAL_TOKEN or config token');
+    const res = await fetch(`${baseUrl}/api/cli/v1/shorts/${id}/qr`, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'image/png' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    fs.writeFileSync(out, buf);
+    return print({ ok: true, result: { path: out, bytes: buf.length } });
+  }
   if (group === 'analytics' && command === 'summary') {
     const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
     return print(await api(`/analytics/summary${query}`));
+  }
+  if (group === 'analytics' && command === 'links') {
+    const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
+    return print(await api(`/analytics/links${query}`));
+  }
+  if (group === 'analytics' && command === 'shorts') {
+    const query = flags.window ? `?window=${encodeURIComponent(flags.window)}` : '';
+    return print(await api(`/analytics/shorts${query}`));
   }
   throw new Error(`Unknown command: ${positional.join(' ')}`);
 }
