@@ -22,6 +22,7 @@ It is built for automation, operator workflows, scripting, and AI agents that ne
 
 ## Features
 
+- Structured JSON errors with useful exit codes
 - JSON-first output everywhere
 - token + base-url config via env or config file
 - profile read/update
@@ -99,6 +100,7 @@ xrplsocial links delete --id 123
 xrplsocial links reorder --file order.json
 xrplsocial links sync --file links.json
 xrplsocial links sync --file links.json --delete-missing
+xrplsocial links export --out links.json
 xrplsocial shorts list
 xrplsocial shorts create --title "Launch" --destination-url https://example.com
 xrplsocial shorts update --id 123 --destination-url https://example.com/updated --title "Updated"
@@ -109,6 +111,7 @@ xrplsocial analytics summary
 xrplsocial analytics summary --window 7d
 xrplsocial analytics links --window 7d
 xrplsocial analytics shorts --window 7d
+xrplsocial analytics export --kind summary --window 7d --out analytics.json
 ```
 
 ## Examples

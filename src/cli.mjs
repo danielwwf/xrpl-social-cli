@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import { api } from './client.mjs';
+import { CliError } from './errors.mjs';
 import { configPath, readConfig, writeConfig } from './config.mjs';
 function parseArgs(argv) {
   const positional = [];
@@ -16,6 +17,7 @@ function parseArgs(argv) {
   return { positional, flags };
 }
 function print(obj) { console.log(JSON.stringify(obj, null, 2)); }
+function writeJsonFile(path, value) { fs.writeFileSync(path, JSON.stringify(value, null, 2) + '\n'); }
 function boolFlag(value, fallback = undefined) {
   if (value === undefined) return fallback;
   return value === true || value === 'true' || value === '1';
@@ -36,6 +38,7 @@ function usage() {
       'xrplsocial links delete --id 123',
       'xrplsocial links reorder --file order.json',
       'xrplsocial links sync --file links.json [--delete-missing]',
+      'xrplsocial links export [--out links.json]',
       'xrplsocial shorts list',
       'xrplsocial shorts create --title "..." --destination-url https://...',
       'xrplsocial shorts update --id 123 --destination-url https://... [--title "..."]',
@@ -44,7 +47,8 @@ function usage() {
       'xrplsocial shorts qr --id 123 --out short-123.png',
       'xrplsocial analytics summary [--window all|today|7d|30d]',
       'xrplsocial analytics links [--window all|today|7d|30d]',
-      'xrplsocial analytics shorts [--window all|today|7d|30d]'
+      'xrplsocial analytics shorts [--window all|today|7d|30d]',
+      'xrplsocial analytics export --kind summary --window 7d [--out analytics.json]'
     ]
   };
 }
@@ -110,6 +114,12 @@ export async function run(argv) {
     const body = JSON.parse(fs.readFileSync(flags.file, 'utf8'));
     return print(await api('/links/reorder', { method: 'POST', body }));
   }
+  if (group === 'links' && command === 'export') {
+    const out = flags.out || 'links.json';
+    const listed = await api('/links');
+    writeJsonFile(out, listed.result);
+    return print({ ok: true, result: { path: out } });
+  }
   if (group === 'links' && command === 'sync') {
     if (!flags.file) throw new Error('Missing --file <links.json>');
     const body = JSON.parse(fs.readFileSync(flags.file, 'utf8'));
@@ -145,5 +155,14 @@ export async function run(argv) {
   if (group === 'analytics' && command === 'summary') return print(await api(`/analytics/summary${queryWindow(flags)}`));
   if (group === 'analytics' && command === 'links') return print(await api(`/analytics/links${queryWindow(flags)}`));
   if (group === 'analytics' && command === 'shorts') return print(await api(`/analytics/shorts${queryWindow(flags)}`));
+  if (group === 'analytics' && command === 'export') {
+    if (!flags.kind) throw new CliError('Missing --kind <summary|links|shorts>', 2);
+    const kind = String(flags.kind);
+    if (!['summary','links','shorts'].includes(kind)) throw new CliError('Invalid --kind, expected summary|links|shorts', 2);
+    const out = flags.out || `analytics-${kind}.json`;
+    const data = await api(`/analytics/${kind}${queryWindow(flags)}`);
+    writeJsonFile(out, data.result);
+    return print({ ok: true, result: { path: out, kind } });
+  }
   throw new Error(`Unknown command: ${positional.join(' ')}`);
 }
