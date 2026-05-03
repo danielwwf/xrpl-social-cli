@@ -106,6 +106,11 @@ xrplsocial analytics links --window 7d
 xrplsocial analytics shorts --window 7d
 ```
 
+## Examples
+
+- `examples/links-sync.json`
+- `examples/links-reorder.json`
+
 ## File shapes
 
 ### links sync
@@ -136,6 +141,12 @@ xrplsocial analytics shorts --window 7d
 ```bash
 npm run ci
 ```
+
+## Release flow
+
+- see `RELEASING.md`
+- GitHub Actions package check on tags/workflow dispatch
+- `npm pack` used as packaging sanity gate
 
 ## License
 

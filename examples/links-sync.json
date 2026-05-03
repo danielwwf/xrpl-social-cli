@@ -1,0 +1,6 @@
+{
+  "links": [
+    {"label": "Homepage", "url": "https://example.com"},
+    {"label": "Docs", "url": "https://docs.example.com"}
+  ]
+}
