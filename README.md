@@ -7,9 +7,11 @@
   Clean commands, boring config, strong defaults, no nonsense.
 </p>
 
-[![CI](https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml)
-![Node >=20](https://img.shields.io/badge/node-%3E%3D20-111827?logo=node.js&logoColor=7ee787)
-![License MIT](https://img.shields.io/badge/license-MIT-111827)
+<p align="center">
+  <a href="https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/danielwwf/xrpl-social-cli/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="Node >=20" src="https://img.shields.io/badge/node-%3E%3D20-111827?logo=node.js&logoColor=7ee787">
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-111827">
+</p>
 
 ## Why this exists
 
